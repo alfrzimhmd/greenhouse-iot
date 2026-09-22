@@ -12,9 +12,6 @@
     <!-- ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.0/dist/apexcharts.min.js"></script>
     
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
-    
     <!-- Google Fonts (Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,6 +69,11 @@
         .stat-value {
             font-variant-numeric: tabular-nums;
         }
+        
+        @keyframes loading {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
     </style>
     
     @stack('styles')
@@ -80,5 +82,7 @@
     @yield('content')
     
     @stack('scripts')
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 </body>
 </html>

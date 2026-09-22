@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\ControlLog;
 use Illuminate\Http\Request;
 use PhpMqtt\Client\MqttClient;
@@ -16,7 +17,6 @@ class ControlController extends Controller
 
     public function send(Request $request)
     {
-        // Validasi: action sesuai aktuator V2
         $validated = $request->validate([
             'action' => 'required|in:growlight,exhaust,pompa,atap,mode',
             'value' => 'required|string',
@@ -30,6 +30,9 @@ class ControlController extends Controller
                 'value' => $validated['value'],
                 'source' => 'web',
             ]);
+
+            // ===== LOG ACTIVITY =====
+            $this->logActivity($validated['action'], $validated['value']);
 
             return response()->json([
                 'success' => true,
@@ -61,6 +64,9 @@ class ControlController extends Controller
         ]);
     }
 
+    /**
+     * Publish ke MQTT
+     */
     private function publishMqtt(string $action, string $value)
     {
         $clientId = 'laravel-publisher-' . rand(1000, 9999);
@@ -79,5 +85,52 @@ class ControlController extends Controller
 
         $mqtt->publish($this->topicControl, $payload, 0);
         $mqtt->disconnect();
+    }
+
+    /**
+     * Log activity ke DB
+     */
+    private function logActivity(string $action, string $value)
+    {
+        $actionLabels = [
+            'growlight' => 'Grow Light',
+            'exhaust'   => 'Exhaust Fan',
+            'pompa'     => 'Pompa Air',
+            'atap'      => 'Atap',
+            'mode'      => 'Mode Sistem',
+        ];
+
+        $label = $actionLabels[$action] ?? $action;
+
+        // Tentukan title, description, severity, icon
+        if ($action === 'mode') {
+            $isAuto = ($value === 'auto');
+            ActivityLog::log(
+                'control',
+                "Mode diubah ke " . ($isAuto ? 'OTOMATIS' : 'MANUAL'),
+                'Dikontrol dari dashboard',
+                'info',
+                'settings'
+            );
+            return;
+        }
+
+        // Untuk aktuator on/off
+        $isOn = ($value === 'on');
+
+        $title = "{$label} " . ($isOn ? 'dinyalakan' : 'dimatikan');
+        $description = $isOn
+            ? "Dikontrol manual dari dashboard"
+            : "Dimatikan dari dashboard";
+
+        $severity = $isOn ? 'success' : 'info';
+
+        ActivityLog::log(
+            'control',
+            $title,
+            $description,
+            $severity,
+            $action
+        );
     }
 }
