@@ -74,6 +74,75 @@
             from { width: 0%; }
             to { width: 100%; }
         }
+
+        /* ============================================================
+           CHART STYLING
+           Y-axis overlay FIXED di luar scroll area.
+           Hanya SVG bar yang di-scroll.
+        ============================================================ */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 260px;
+        }
+
+        /* Area Y-axis (fixed, tidak ikut scroll) */
+        .chart-yaxis {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 42px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 22px 4px 32px 0;   /* top = grid padding top, bottom = x-axis height */
+            font-size: 10px;
+            font-weight: 600;
+            color: #6b7280;
+            background: linear-gradient(to right, rgba(249,250,251,1) 80%, rgba(249,250,251,0));
+            z-index: 10;
+            pointer-events: none;
+            font-variant-numeric: tabular-nums;
+        }
+        .chart-yaxis span {
+            line-height: 1;
+        }
+
+        /* Area scroll untuk chart (bar saja) */
+        .chart-scroll {
+            position: absolute;
+            left: 42px;              /* geser ke kanan untuk kasih ruang Y-axis */
+            right: 0;
+            top: 0;
+            bottom: 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: thin;
+        }
+        .chart-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+        .chart-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .chart-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        /* Garis vertikal pembatas Y-axis (visual) */
+        .chart-yaxis-border {
+            position: absolute;
+            left: 42px;
+            top: 22px;
+            bottom: 32px;
+            width: 1px;
+            background: #e5e7eb;
+            z-index: 9;
+            pointer-events: none;
+        }
     </style>
     
     @stack('styles')

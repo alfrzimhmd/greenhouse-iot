@@ -251,12 +251,17 @@
         </div>
     </div>
 
-    <!-- CARD GRAFIK HISTORY -->
+    <!-- ============================================= -->
+    <!-- CARD GRAFIK HISTORY - MULTI SMALL BAR CHARTS  -->
+    <!-- ============================================= -->
     <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl mb-6">
-        <div class="flex flex-wrap justify-between items-center mb-4 gap-3">
+        <div class="flex flex-wrap justify-between items-center mb-5 gap-3">
             <div class="flex items-center gap-2">
                 <span class="w-1 h-6 bg-purple-500 rounded-full"></span>
                 <h2 class="text-gray-800 font-bold text-lg">History Sensor</h2>
+                <span class="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full font-semibold">
+                    Bar Chart
+                </span>
             </div>
             <div class="flex items-center gap-2">
                 <select x-model="chartLimit" @change="loadHistory()"
@@ -269,56 +274,141 @@
                 <span class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Auto 2s</span>
             </div>
         </div>
-        
-        <!-- LEGEND HTML — FIXED di luar scroll -->
-        <div class="flex flex-wrap items-center justify-center gap-4 mb-3 px-4 py-2 bg-gray-50 rounded-lg">
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full" style="background: #ef4444;"></span>
-                <span class="text-xs font-semibold text-gray-700">Suhu (°C)</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full" style="background: #3b82f6;"></span>
-                <span class="text-xs font-semibold text-gray-700">Kelembapan (%)</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full" style="background: #a855f7;"></span>
-                <span class="text-xs font-semibold text-gray-700">Gas (ppm)</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full" style="background: #06b6d4;"></span>
-                <span class="text-xs font-semibold text-gray-700">Level Air (%)</span>
-            </div>
-        </div>
-        
-        <div class="flex items-center gap-2 mb-3 text-xs text-gray-500">
+
+        <!-- Info -->
+        <div class="flex items-center gap-2 mb-4 text-xs text-gray-500 bg-gray-50 px-3 py-2 rounded-lg">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <span>Geser chart ke kiri/kanan untuk melihat data sebelumnya</span>
+            <span><b>Data terbaru di kiri</b> • Data lama di kanan. Y-axis tetap diam saat di-scroll. Warna bar berubah otomatis sesuai status.</span>
         </div>
-        
-        <!-- CHART CONTAINER — scroll hanya area grafik -->
-        <div class="relative" style="height: 420px;">
-            <!-- Y-axis kiri: FIXED overlay -->
-            <div class="absolute left-0 top-0 bottom-0 w-12 z-10 pointer-events-none flex flex-col justify-between py-16 pr-1 text-right"
-                 style="background: linear-gradient(to right, rgba(255,255,255,1) 70%, rgba(255,255,255,0));">
-                <span class="text-[10px] font-semibold" style="color: #ef4444;">50</span>
-                <span class="text-[10px] font-semibold" style="color: #ef4444;">25</span>
-                <span class="text-[10px] font-semibold" style="color: #ef4444;">0</span>
-            </div>
+
+        <!-- Grid 4 Mini Bar Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
             
-            <!-- Y-axis kanan: FIXED overlay -->
-            <div class="absolute right-0 top-0 bottom-0 w-12 z-10 pointer-events-none flex flex-col justify-between py-16 pl-1 text-left"
-                 style="background: linear-gradient(to left, rgba(255,255,255,1) 70%, rgba(255,255,255,0));">
-                <span class="text-[10px] font-semibold" style="color: #a855f7;">2000</span>
-                <span class="text-[10px] font-semibold" style="color: #a855f7;">1000</span>
-                <span class="text-[10px] font-semibold" style="color: #a855f7;">0</span>
+            <!-- Chart 1: Suhu -->
+            <div class="bg-gray-50/70 rounded-xl border border-gray-100 overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-white/60">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full" style="background: #ef4444;"></span>
+                        <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">Suhu</span>
+                        <span class="text-xs text-gray-400">(°C)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500">Max 50</span>
+                        <span class="text-sm font-extrabold text-red-600 tabular-nums"
+                              x-text="sensor.suhu !== undefined ? parseFloat(sensor.suhu).toFixed(1) : '--'"></span>
+                    </div>
+                </div>
+                <!-- Chart wrapper dengan Y-axis fixed + scroll area -->
+                <div class="chart-wrapper">
+                    <!-- Y-axis FIXED (tidak ikut scroll) -->
+                    <div class="chart-yaxis">
+                        <span>50</span>
+                        <span>40</span>
+                        <span>30</span>
+                        <span>20</span>
+                        <span>10</span>
+                        <span>0</span>
+                    </div>
+                    <div class="chart-yaxis-border"></div>
+                    <!-- Area scroll: hanya berisi SVG bar -->
+                    <div class="chart-scroll">
+                        <div id="chartSuhu" style="width: 1100px; height: 100%;"></div>
+                    </div>
+                </div>
             </div>
-            
-            <!-- Chart area dengan scroll -->
-            <div class="overflow-x-auto overflow-y-hidden h-full" style="scrollbar-width: thin;" id="chartScrollContainer">
-                <div id="historyChart" style="width: 2400px; height: 100%;"></div>
+
+            <!-- Chart 2: Kelembapan -->
+            <div class="bg-gray-50/70 rounded-xl border border-gray-100 overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-white/60">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full" style="background: #3b82f6;"></span>
+                        <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">Kelembapan</span>
+                        <span class="text-xs text-gray-400">(%)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500">Max 100</span>
+                        <span class="text-sm font-extrabold text-blue-600 tabular-nums"
+                              x-text="sensor.kelembapan !== undefined ? parseFloat(sensor.kelembapan).toFixed(0) : '--'"></span>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="chart-yaxis">
+                        <span>100</span>
+                        <span>80</span>
+                        <span>60</span>
+                        <span>40</span>
+                        <span>20</span>
+                        <span>0</span>
+                    </div>
+                    <div class="chart-yaxis-border"></div>
+                    <div class="chart-scroll">
+                        <div id="chartRH" style="width: 1100px; height: 100%;"></div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Chart 3: Gas -->
+            <div class="bg-gray-50/70 rounded-xl border border-gray-100 overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-white/60">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full" style="background: #a855f7;"></span>
+                        <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">Gas / CO₂</span>
+                        <span class="text-xs text-gray-400">(ppm)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500">Max 2000</span>
+                        <span class="text-sm font-extrabold text-purple-600 tabular-nums"
+                              x-text="sensor.gas_ppm ?? '--'"></span>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="chart-yaxis">
+                        <span>2k</span>
+                        <span>1.6k</span>
+                        <span>1.2k</span>
+                        <span>800</span>
+                        <span>400</span>
+                        <span>0</span>
+                    </div>
+                    <div class="chart-yaxis-border"></div>
+                    <div class="chart-scroll">
+                        <div id="chartGas" style="width: 1100px; height: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 4: Level Air -->
+            <div class="bg-gray-50/70 rounded-xl border border-gray-100 overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-white/60">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full" style="background: #06b6d4;"></span>
+                        <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">Level Air</span>
+                        <span class="text-xs text-gray-400">(%)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500">Max 100</span>
+                        <span class="text-sm font-extrabold text-cyan-600 tabular-nums"
+                              x-text="sensor.level_air !== undefined ? parseFloat(sensor.level_air).toFixed(0) : '--'"></span>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="chart-yaxis">
+                        <span>100</span>
+                        <span>80</span>
+                        <span>60</span>
+                        <span>40</span>
+                        <span>20</span>
+                        <span>0</span>
+                    </div>
+                    <div class="chart-yaxis-border"></div>
+                    <div class="chart-scroll">
+                        <div id="chartAir" style="width: 1100px; height: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -532,9 +622,14 @@ window.dashboard = function() {
         sensor: {},
         connected: false,
         lastUpdate: '-',
-        chart: null,
         pollingInterval: null,
         chartLimit: 20,
+        
+        // 4 mini bar charts
+        chartSuhu: null,
+        chartRH: null,
+        chartGas: null,
+        chartAir: null,
         
         activities: [],
         activityFilter: 'all',
@@ -555,7 +650,7 @@ window.dashboard = function() {
         async init() {
             console.log('Dashboard init');
             try {
-                this.initChart();
+                this.initCharts();
                 await this.loadLatest();
                 await this.loadHistory();
                 await this.loadActivity();
@@ -574,7 +669,6 @@ window.dashboard = function() {
                 if (json.success) {
                     const serverData = json.data;
                     
-                    // Skip overwrite untuk action yang masih pending
                     const keys = ['growlight', 'exhaust', 'pompa', 'atap', 'mode'];
                     keys.forEach(k => {
                         if (this.pendingActions[k]) {
@@ -593,8 +687,10 @@ window.dashboard = function() {
             try {
                 const res = await fetch('/api/sensor/history?limit=' + this.chartLimit);
                 const json = await res.json();
-                if (json.success && json.data && json.data.length > 0) this.updateChart(json.data);
-            } catch (e) {}
+                if (json.success && json.data && json.data.length > 0) {
+                    this.updateAllCharts(json.data);
+                }
+            } catch (e) { console.error('loadHistory error', e); }
         },
 
         async loadActivity() {
@@ -752,109 +848,187 @@ window.dashboard = function() {
             } catch (e) { alert('Sync gagal: ' + e.message); }
         },
 
-        initChart() {
-            const options = {
+        // ============================================
+        // INIT 4 MINI BAR CHARTS
+        // Y-axis DI-HIDE di ApexCharts karena kita pakai HTML overlay manual
+        // ============================================
+        initCharts() {
+            const gasColorFn = ({ value }) => {
+                if (value <= 500) return '#22c55e';
+                if (value <= 750) return '#eab308';
+                return '#ef4444';
+            };
+
+            const airColorFn = ({ value }) => {
+                if (value > 50) return '#22c55e';
+                if (value > 20) return '#eab308';
+                return '#ef4444';
+            };
+
+            // ⭐ TAMBAH parameter maxVal
+            const baseOptions = (color, name, unit, maxVal) => ({
                 chart: {
-                    type: 'area',
+                    type: 'bar',
                     height: '100%',
-                    width: 2400,
+                    width: '100%',
                     fontFamily: 'Inter, sans-serif',
                     toolbar: { show: false },
                     zoom: { enabled: false },
-                    animations: { enabled: false },
+                    animations: { 
+                        enabled: true, 
+                        easing: 'easeinout', 
+                        speed: 300,
+                        dynamicAnimation: { enabled: true, speed: 250 }
+                    },
                     background: 'transparent',
-                    parentHeightOffset: 0
+                    parentHeightOffset: 0,
+                    offsetX: 0,
+                    offsetY: 0,
+                    redrawOnParentResize: false,
+                    redrawOnWindowResize: true
                 },
-                series: [
-                    { name: 'Suhu (°C)', data: [] },
-                    { name: 'Kelembapan (%)', data: [] },
-                    { name: 'Gas (ppm)', data: [] },
-                    { name: 'Level Air (%)', data: [] }
-                ],
-                colors: ['#ef4444', '#3b82f6', '#a855f7', '#06b6d4'],
+                series: [{ name: name, data: [] }],
+                colors: [color],
+                plotOptions: {
+                    bar: {
+                        borderRadius: 3,
+                        borderRadiusApplication: 'end',
+                        columnWidth: '50%',
+                        barHeight: '40%',
+                        horizontal: false,
+                        distributed: false,
+                        dataLabels: { position: 'top' }
+                    }
+                },
                 dataLabels: { enabled: false },
-                stroke: { curve: 'smooth', width: 2 },
+                stroke: { width: 0 },
                 fill: {
                     type: 'gradient',
                     gradient: {
-                        shadeIntensity: 0.4,
-                        opacityFrom: 0.3,
-                        opacityTo: 0.05,
-                        stops: [0, 90, 100]
+                        shade: 'light',
+                        type: 'vertical',
+                        shadeIntensity: 0.3,
+                        opacityFrom: 1,
+                        opacityTo: 0.75,
+                        stops: [0, 100]
                     }
                 },
-                markers: { size: 0, hover: { size: 5 } },
-                yaxis: [
-                    {
-                        seriesName: 'Suhu (°C)',
-                        show: false,
-                        max: 50,
-                        min: 0
-                    },
-                    {
-                        seriesName: 'Kelembapan (%)',
-                        show: false,
-                        max: 100,
-                        min: 0
-                    },
-                    {
-                        seriesName: 'Gas (ppm)',
-                        show: false,
-                        max: 2000,
-                        min: 0
-                    },
-                    {
-                        seriesName: 'Level Air (%)',
-                        show: false,
-                        max: 100,
-                        min: 0
-                    }
-                ],
+                markers: { size: 0 },
+                
+                // ⭐ FIX DI SINI — paksa max & min
+                yaxis: {
+                    show: false,
+                    max: maxVal,             // ⬅️ PAKSA max sesuai HTML overlay
+                    min: 0,                  // ⬅️ PAKSA min
+                    forceNiceScale: false,   // ⬅️ jangan auto-round (biar 2000 tetap 2000)
+                    tickAmount: 5            // ⬅️ konsisten 5 tick
+                },
+                
                 xaxis: {
-                    type: 'datetime',
+                    type: 'category',
                     labels: {
-                        style: { fontSize: '10px', colors: '#9ca3af', fontWeight: 500 },
-                        datetimeUTC: false,
-                        format: 'HH:mm:ss'
+                        style: { fontSize: '9px', colors: '#9ca3af', fontWeight: 500 },
+                        rotate: -45,
+                        rotateAlways: false,
+                        hideOverlappingLabels: true,
+                        trim: false,
+                        showDuplicates: false
                     },
                     axisBorder: { show: false },
-                    axisTicks: { show: false }
+                    axisTicks: { show: false },
+                    tooltip: { enabled: false }
                 },
                 legend: { show: false },
                 tooltip: {
-                    shared: true,
-                    intersect: false,
                     theme: 'light',
-                    x: { format: 'dd MMM HH:mm:ss' },
-                    style: { fontSize: '12px' }
+                    style: { fontSize: '11px' },
+                    custom: ({ series, seriesIndex, dataPointIndex, w }) => {
+                        const raw = w.globals.initialSeries[seriesIndex].rawData?.[dataPointIndex];
+                        const value = series[seriesIndex][dataPointIndex];
+                        const timeLabel = raw?.timeLabel || '-';
+                        return `
+                            <div class="px-3 py-2 text-xs">
+                                <div class="font-bold text-gray-700 mb-1">${timeLabel}</div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full" style="background:${color};"></span>
+                                    <span class="text-gray-500">${name}:</span>
+                                    <span class="font-bold text-gray-800">${parseFloat(value).toFixed(1)} ${unit}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
                 },
                 grid: {
                     borderColor: '#f3f4f6',
-                    strokeDashArray: 4,
+                    strokeDashArray: 3,
                     xaxis: { lines: { show: false } },
                     yaxis: { lines: { show: true } },
-                    padding: { top: 10, right: 50, bottom: 0, left: 50 }
+                    padding: { 
+                        top: 10, 
+                        right: 15, 
+                        bottom: 0, 
+                        left: 8 
+                    }
                 }
-            };
-            this.chart = new ApexCharts(document.querySelector('#historyChart'), options);
-            this.chart.render();
-            console.log('Chart initialized');
+            });
+
+            // ⭐ Tambah maxVal di pemanggilan
+            const gasOptions = baseOptions('#a855f7', 'Gas', 'ppm', 2000);
+            gasOptions.plotOptions.bar.distributed = true;
+            gasOptions.colors = [gasColorFn];
+            gasOptions.fill = { type: 'solid' };
+
+            const airOptions = baseOptions('#06b6d4', 'Level Air', '%', 100);
+            airOptions.plotOptions.bar.distributed = true;
+            airOptions.colors = [airColorFn];
+            airOptions.fill = { type: 'solid' };
+
+            // ⭐ Tambah maxVal di pemanggilan
+            this.chartSuhu = new ApexCharts(document.querySelector('#chartSuhu'), baseOptions('#ef4444', 'Suhu', '°C', 50));
+            this.chartRH   = new ApexCharts(document.querySelector('#chartRH'),   baseOptions('#3b82f6', 'Kelembapan', '%', 100));
+            this.chartGas  = new ApexCharts(document.querySelector('#chartGas'),  gasOptions);
+            this.chartAir  = new ApexCharts(document.querySelector('#chartAir'),  airOptions);
+
+            this.chartSuhu.render();
+            this.chartRH.render();
+            this.chartGas.render();
+            this.chartAir.render();
+            console.log('4 mini bar charts initialized (Y-axis overlay mode)');
         },
 
-        updateChart(data) {
-            if (!this.chart) return;
-            
-            const suhuData = data.map(d => [new Date(d.created_at).getTime(), parseFloat(d.suhu || 0)]);
-            const rhData = data.map(d => [new Date(d.created_at).getTime(), parseFloat(d.kelembapan || 0)]);
-            const gasData = data.map(d => [new Date(d.created_at).getTime(), parseFloat(d.gas_ppm || 0)]);
-            const airData = data.map(d => [new Date(d.created_at).getTime(), parseFloat(d.level_air || 0)]);
-            
-            this.chart.updateSeries([
-                { name: 'Suhu (°C)', data: suhuData },
-                { name: 'Kelembapan (%)', data: rhData },
-                { name: 'Gas (ppm)', data: gasData },
-                { name: 'Level Air (%)', data: airData }
-            ]);
+        // ============================================
+        // UPDATE 4 MINI BAR CHARTS
+        // 🔄 DATA TERBARU DI KIRI, LAMA DI KANAN
+        // ============================================
+        updateAllCharts(data) {
+            const safe = (v) => (v === null || v === undefined || isNaN(parseFloat(v))) ? 0 : parseFloat(v);
+            const fmtTime = (dateStr, withDate = false) => {
+                const d = new Date(dateStr);
+                const time = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                if (!withDate) return time;
+                const date = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+                return `${date} ${time}`;
+            };
+
+            // ⭐ REVERSE: data terbaru → index 0 (paling kiri)
+            const reversedData = [...data].reverse();
+
+            const formatData = (key) => reversedData.map(d => ({
+                x: fmtTime(d.created_at),
+                y: safe(d[key]),
+                timeLabel: fmtTime(d.created_at, true),
+                rawValue: safe(d[key])
+            }));
+
+            const suhuData = formatData('suhu');
+            const rhData   = formatData('kelembapan');
+            const gasData  = formatData('gas_ppm');
+            const airData  = formatData('level_air');
+
+            if (this.chartSuhu) this.chartSuhu.updateSeries([{ name: 'Suhu', data: suhuData, rawData: suhuData }]);
+            if (this.chartRH)   this.chartRH.updateSeries([{ name: 'Kelembapan', data: rhData, rawData: rhData }]);
+            if (this.chartGas)  this.chartGas.updateSeries([{ name: 'Gas', data: gasData, rawData: gasData }]);
+            if (this.chartAir)  this.chartAir.updateSeries([{ name: 'Level Air', data: airData, rawData: airData }]);
         },
 
         async setMode(mode) {
