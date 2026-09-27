@@ -3,9 +3,11 @@
 @section('title', 'Greenhouse Dashboard V3')
 
 @section('content')
+{{-- Kontainer utama dashboard. Seluruh state dan aksi dikelola oleh fungsi dashboard() pada Alpine.js. --}}
 <div class="container mx-auto p-6 max-w-7xl" x-data="dashboard()" x-cloak>
     
     <!-- Header -->
+    {{-- Bagian atas berisi judul aplikasi, indikator pengiriman, indikator alarm, dan status koneksi. --}}
     <div class="flex flex-wrap justify-between items-center mb-8 gap-3">
         <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
@@ -20,6 +22,7 @@
         </div>
         
         <div class="flex items-center gap-3">
+            {{-- Indikator proses pengiriman perintah ke server. --}}
             <div x-show="isSending" x-transition
                  class="flex items-center gap-2 bg-blue-500/90 backdrop-blur-md px-4 py-2 rounded-full border border-blue-300/50 shadow-lg">
                 <svg class="w-4 h-4 text-white animate-spin" fill="none" viewBox="0 0 24 24">
@@ -29,6 +32,7 @@
                 <span class="text-white font-bold text-sm">Mengirim...</span>
             </div>
             
+            {{-- Indikator alarm yang muncul saat kondisi sensor berada di luar ambang batas. --}}
             <div x-show="sensor.alarm" x-transition
                  class="flex items-center gap-2 bg-red-500/90 backdrop-blur-md px-4 py-2 rounded-full border border-red-300/50 shadow-lg animate-pulse">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -37,6 +41,7 @@
                 <span class="text-white font-bold text-sm">ALARM AKTIF</span>
             </div>
             
+            {{-- Status koneksi ke server, ditentukan dari keberhasilan polling data terbaru. --}}
             <div class="flex items-center gap-3 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30">
                 <span :class="connected ? 'bg-green-400' : 'bg-red-400'" class="w-2.5 h-2.5 rounded-full pulse-dot"></span>
                 <span class="text-white font-semibold text-sm" x-text="connected ? 'Connected' : 'Disconnected'"></span>
@@ -44,7 +49,8 @@
         </div>
     </div>
 
-    <!-- Sensor Cards (5 cards) -->
+    <!-- Sensor Cards (5 kartu) -->
+    {{-- Menampilkan lima parameter utama: suhu, kelembapan, gas, cahaya, dan level air. --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <!-- Suhu -->
         <div class="glass rounded-2xl p-5 card-hover border border-white/50 shadow-xl relative overflow-hidden group">
@@ -175,7 +181,8 @@
         </div>
     </div>
 
-    <!-- Mode + Control -->
+    <!-- Mode dan Kontrol -->
+    {{-- Panel untuk memilih mode operasi serta mengendalikan aktuator secara manual. --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
         <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl">
             <h2 class="text-gray-800 font-bold text-lg mb-4 flex items-center gap-2">
@@ -208,6 +215,7 @@
                 Kontrol Aktuator
             </h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {{-- Tombol Grow Light --}}
                 <button @click="toggleControl('growlight')"
                         :class="sensor.growlight ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg shadow-yellow-500/30' : 'bg-gradient-to-br from-gray-300 to-gray-400'"
                         class="py-4 rounded-xl text-white font-bold transition-all duration-300 hover:scale-105 flex flex-col items-center gap-1">
@@ -218,6 +226,7 @@
                     <span class="text-xs opacity-90" x-text="sensor.growlight ? 'ON' : 'OFF'"></span>
                 </button>
                 
+                {{-- Tombol Exhaust --}}
                 <button @click="toggleControl('exhaust')"
                         :class="sensor.exhaust ? 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-500/30' : 'bg-gradient-to-br from-gray-300 to-gray-400'"
                         class="py-4 rounded-xl text-white font-bold transition-all duration-300 hover:scale-105 flex flex-col items-center gap-1">
@@ -228,6 +237,7 @@
                     <span class="text-xs opacity-90" x-text="sensor.exhaust ? 'ON' : 'OFF'"></span>
                 </button>
                 
+                {{-- Tombol Pompa --}}
                 <button @click="toggleControl('pompa')"
                         :class="sensor.pompa ? 'bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-lg shadow-cyan-500/30' : 'bg-gradient-to-br from-gray-300 to-gray-400'"
                         class="py-4 rounded-xl text-white font-bold transition-all duration-300 hover:scale-105 flex flex-col items-center gap-1">
@@ -238,6 +248,7 @@
                     <span class="text-xs opacity-90" x-text="sensor.pompa ? 'ON' : 'OFF'"></span>
                 </button>
                 
+                {{-- Tombol Atap --}}
                 <button @click="toggleControl('atap')"
                         :class="sensor.atap ? 'bg-gradient-to-br from-purple-400 to-purple-600 shadow-lg shadow-purple-500/30' : 'bg-gradient-to-br from-gray-300 to-gray-400'"
                         class="py-4 rounded-xl text-white font-bold transition-all duration-300 hover:scale-105 flex flex-col items-center gap-1">
@@ -251,9 +262,7 @@
         </div>
     </div>
 
-    <!-- ============================================= -->
-    <!-- CARD GRAFIK HISTORY - MULTI SMALL BAR CHARTS  -->
-    <!-- ============================================= -->
+    {{-- Bagian riwayat sensor dalam bentuk empat mini bar chart. --}}
     <div class="glass rounded-2xl p-6 border border-white/50 shadow-xl mb-6">
         <div class="flex flex-wrap justify-between items-center mb-5 gap-3">
             <div class="flex items-center gap-2">
@@ -264,6 +273,7 @@
                 </span>
             </div>
             <div class="flex items-center gap-2">
+                {{-- Pemilihan jumlah data yang ditampilkan pada grafik. --}}
                 <select x-model="chartLimit" @change="loadHistory()"
                         class="text-xs bg-gray-100 border-0 rounded-lg px-3 py-1.5 text-gray-700 font-medium">
                     <option value="20">20 data</option>
@@ -275,7 +285,7 @@
             </div>
         </div>
 
-        <!-- Info -->
+        {{-- Keterangan arah data dan perilaku sumbu Y. --}}
         <div class="flex items-center gap-2 mb-4 text-xs text-gray-500 bg-gray-50 px-3 py-2 rounded-lg">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -283,7 +293,7 @@
             <span><b>Data terbaru di kiri</b> • Data lama di kanan. Y-axis tetap diam saat di-scroll. Warna bar berubah otomatis sesuai status.</span>
         </div>
 
-        <!-- Grid 4 Mini Bar Charts -->
+        {{-- Grid empat mini bar chart. --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
             
             <!-- Chart 1: Suhu -->
@@ -300,9 +310,8 @@
                               x-text="sensor.suhu !== undefined ? parseFloat(sensor.suhu).toFixed(1) : '--'"></span>
                     </div>
                 </div>
-                <!-- Chart wrapper dengan Y-axis fixed + scroll area -->
+                {{-- Sumbu Y ditempatkan terpisah agar tidak ikut bergulir bersama grafik. --}}
                 <div class="chart-wrapper">
-                    <!-- Y-axis FIXED (tidak ikut scroll) -->
                     <div class="chart-yaxis">
                         <span>50</span>
                         <span>40</span>
@@ -312,7 +321,6 @@
                         <span>0</span>
                     </div>
                     <div class="chart-yaxis-border"></div>
-                    <!-- Area scroll: hanya berisi SVG bar -->
                     <div class="chart-scroll">
                         <div id="chartSuhu" style="width: 1100px; height: 100%;"></div>
                     </div>
@@ -412,7 +420,8 @@
         </div>
     </div>
 
-    <!-- CARD JADWAL POMPA -->
+    <!-- Kartu Jadwal Pompa -->
+    {{-- Menampilkan daftar jadwal penyiraman dan formulir untuk menambah atau mengubah jadwal. --}}
     <div class="glass rounded-2xl border border-white/50 shadow-xl mb-6 overflow-hidden">
         <div class="flex flex-wrap justify-between items-center p-6 border-b border-gray-100 gap-3">
             <div class="flex items-center gap-2">
@@ -435,6 +444,7 @@
             </div>
         </div>
         
+        {{-- Formulir jadwal, ditampilkan saat tombol tambah atau edit ditekan. --}}
         <div x-show="showScheduleForm" x-transition class="p-6 bg-emerald-50/50 border-b border-emerald-100">
             <h3 class="text-sm font-bold text-gray-800 mb-3" x-text="scheduleForm.id ? 'Edit Jadwal' : 'Jadwal Baru'"></h3>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
@@ -480,6 +490,7 @@
             </div>
         </div>
         
+        {{-- Daftar jadwal yang sudah tersimpan. --}}
         <div class="p-4">
             <template x-if="schedules.length === 0">
                 <div class="text-center py-8">
@@ -508,6 +519,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1 flex-shrink-0">
+                            {{-- Tombol mengaktifkan atau menonaktifkan jadwal. --}}
                             <button @click="toggleSchedule(sched)"
                                     :class="sched.enabled ? 'text-emerald-500' : 'text-gray-400'"
                                     class="p-2 hover:bg-white rounded-lg">
@@ -516,11 +528,13 @@
                                     <path x-show="!sched.enabled" stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                             </button>
+                            {{-- Tombol mengubah jadwal. --}}
                             <button @click="editSchedule(sched)" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
                             </button>
+                            {{-- Tombol menghapus jadwal. --}}
                             <button @click="deleteSchedule(sched)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -533,7 +547,8 @@
         </div>
     </div>
 
-    <!-- CARD ACTIVITY FEED -->
+    <!-- Kartu Activity Feed -->
+    {{-- Menampilkan riwayat kejadian yang dikirim perangkat melalui MQTT. --}}
     <div class="glass rounded-2xl border border-white/50 shadow-xl mb-6 overflow-hidden">
         <div class="flex flex-wrap justify-between items-center p-6 border-b border-gray-100 gap-3">
             <div class="flex items-center gap-2">
@@ -543,6 +558,7 @@
                       x-text="activityTotal + ' log'"></span>
             </div>
             <div class="flex items-center gap-2 flex-wrap">
+                {{-- Filter tipe aktivitas. --}}
                 <select x-model="activityFilter" @change="loadActivity()"
                         class="text-sm bg-gray-100 border-0 rounded-lg px-3 py-1.5 text-gray-700 font-medium">
                     <option value="all">Semua Tipe</option>
@@ -553,6 +569,7 @@
                     <option value="schedule">Jadwal</option>
                     <option value="safety">Safety</option>
                 </select>
+                {{-- Tombol menjeda atau mengaktifkan pembaruan otomatis. --}}
                 <button @click="activityAutoRefresh = !activityAutoRefresh"
                         :class="activityAutoRefresh ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-500'"
                         class="text-sm px-3 py-1.5 rounded-lg font-semibold">
@@ -561,6 +578,7 @@
             </div>
         </div>
 
+        {{-- Daftar aktivitas. --}}
         <div class="max-h-96 overflow-y-auto">
             <template x-if="activities.length === 0">
                 <div class="text-center py-16">
@@ -570,6 +588,7 @@
 
             <template x-for="act in activities" :key="act.id">
                 <div class="flex items-start gap-3 p-4 border-b border-gray-50">
+                    {{-- Ikon severity. --}}
                     <div class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
                          :class="{
                              'bg-blue-100 text-blue-600': act.severity === 'info',
@@ -585,6 +604,7 @@
                                 <p class="text-sm font-semibold text-gray-800" x-text="act.title"></p>
                                 <p class="text-xs text-gray-500 mt-0.5" x-text="act.description"></p>
                             </div>
+                            {{-- Waktu relatif aktivitas. --}}
                             <span class="text-xs text-gray-400 whitespace-nowrap" x-text="relativeTime(act.created_at)"></span>
                         </div>
                         <div class="flex items-center gap-2 mt-1.5">
@@ -602,6 +622,7 @@
             </template>
         </div>
 
+        {{-- Keterangan batas log dan tombol pembersihan. --}}
         <div class="px-6 py-3 bg-gray-50/50 border-t border-gray-100 flex justify-between items-center">
             <span class="text-xs text-gray-500">Rotating log: max <span x-text="activityMaxLogs"></span> entri</span>
             <button @click="clearActivities()" class="text-xs text-red-500 font-semibold">Clear All</button>
@@ -617,20 +638,23 @@
 
 @push('scripts')
 <script>
+// Fungsi utama Alpine.js untuk mengelola seluruh state dashboard.
 window.dashboard = function() {
     return {
+        // Data sensor terbaru dan status koneksi.
         sensor: {},
         connected: false,
         lastUpdate: '-',
         pollingInterval: null,
         chartLimit: 20,
         
-        // 4 mini bar charts
+        // Objek grafik yang akan diinisialisasi pada initCharts.
         chartSuhu: null,
         chartRH: null,
         chartGas: null,
         chartAir: null,
         
+        // Data aktivitas dan pengaturan feed.
         activities: [],
         activityFilter: 'all',
         activityAutoRefresh: true,
@@ -638,15 +662,17 @@ window.dashboard = function() {
         activityMaxLogs: 1000,
         activityInterval: null,
         
+        // Data jadwal dan status formulir jadwal.
         schedules: [],
         showScheduleForm: false,
         scheduleForm: { id: null, name: 'Penyiraman', hour: '06', minute: '00', duration: 10, enabled: true },
         
-        // STATE MANAGEMENT
+        // Manajemen proses pengiriman perintah.
         isSending: false,
         pendingActions: {},
         pendingTimeouts: {},
 
+        // Inisialisasi awal dashboard.
         async init() {
             console.log('Dashboard init');
             try {
@@ -662,6 +688,8 @@ window.dashboard = function() {
             }
         },
 
+        // Mengambil data sensor terbaru dari server.
+        // Aksi yang sedang dalam proses pengiriman akan dipertahankan agar tidak tertimpa data lama.
         async loadLatest() {
             try {
                 const res = await fetch('/api/sensor/latest');
@@ -683,6 +711,7 @@ window.dashboard = function() {
             } catch (e) { this.connected = false; }
         },
 
+        // Mengambil riwayat sensor sesuai jumlah data yang dipilih.
         async loadHistory() {
             try {
                 const res = await fetch('/api/sensor/history?limit=' + this.chartLimit);
@@ -693,6 +722,7 @@ window.dashboard = function() {
             } catch (e) { console.error('loadHistory error', e); }
         },
 
+        // Mengambil daftar aktivitas sesuai filter yang dipilih.
         async loadActivity() {
             try {
                 const url = '/api/activity?limit=30&type=' + this.activityFilter;
@@ -705,6 +735,7 @@ window.dashboard = function() {
             } catch (e) {}
         },
 
+        // Mengambil statistik jumlah aktivitas.
         async loadActivityStats() {
             try {
                 const res = await fetch('/api/activity/stats');
@@ -716,6 +747,7 @@ window.dashboard = function() {
             } catch (e) {}
         },
 
+        // Menghapus seluruh riwayat aktivitas.
         async clearActivities() {
             if (!confirm('Hapus semua activity log?')) return;
             try {
@@ -731,6 +763,7 @@ window.dashboard = function() {
             } catch (e) {}
         },
 
+        // Mengubah stempel waktu menjadi keterangan waktu relatif.
         relativeTime(dateStr) {
             const date = new Date(dateStr);
             const diff = Math.floor((new Date() - date) / 1000);
@@ -741,6 +774,7 @@ window.dashboard = function() {
             return Math.floor(diff / 86400) + 'h lalu';
         },
 
+        // Mengambil daftar jadwal pompa dari server.
         async loadSchedules() {
             try {
                 const res = await fetch('/api/schedule');
@@ -749,13 +783,16 @@ window.dashboard = function() {
             } catch (e) {}
         },
 
+        // Membuka formulir jadwal baru dengan nilai awal.
         openScheduleForm() {
             this.scheduleForm = { id: null, name: 'Penyiraman', hour: '06', minute: '00', duration: 10, enabled: true };
             this.showScheduleForm = true;
         },
 
+        // Menutup formulir jadwal.
         closeScheduleForm() { this.showScheduleForm = false; },
 
+        // Mengisi formulir dengan data jadwal yang akan diubah.
         editSchedule(sched) {
             this.scheduleForm = {
                 id: sched.id,
@@ -768,6 +805,7 @@ window.dashboard = function() {
             this.showScheduleForm = true;
         },
 
+        // Menyimpan jadwal baru atau perubahan jadwal yang sudah ada.
         async saveSchedule() {
             let hour = String(this.scheduleForm.hour || '0').padStart(2, '0');
             let minute = String(this.scheduleForm.minute || '0').padStart(2, '0');
@@ -800,6 +838,7 @@ window.dashboard = function() {
             } catch (e) { alert('Error: ' + e.message); }
         },
 
+        // Mengaktifkan atau menonaktifkan jadwal.
         async toggleSchedule(sched) {
             try {
                 const res = await fetch('/api/schedule/' + sched.id, {
@@ -816,6 +855,7 @@ window.dashboard = function() {
             } catch (e) {}
         },
 
+        // Menghapus jadwal setelah konfirmasi pengguna.
         async deleteSchedule(sched) {
             if (!confirm('Hapus jadwal "' + sched.name + '"?')) return;
             try {
@@ -834,6 +874,7 @@ window.dashboard = function() {
             } catch (e) {}
         },
 
+        // Menyinkronkan seluruh jadwal ke perangkat ESP32.
         async syncSchedules() {
             try {
                 const res = await fetch('/api/schedule/sync', {
@@ -848,10 +889,8 @@ window.dashboard = function() {
             } catch (e) { alert('Sync gagal: ' + e.message); }
         },
 
-        // ============================================
-        // INIT 4 MINI BAR CHARTS
-        // Y-axis DI-HIDE di ApexCharts karena kita pakai HTML overlay manual
-        // ============================================
+        // Inisialisasi empat mini bar chart.
+        // Sumbu Y pada ApexCharts disembunyikan karena nilai sumbu ditampilkan melalui elemen HTML terpisah.
         initCharts() {
             const gasColorFn = ({ value }) => {
                 if (value <= 500) return '#22c55e';
@@ -865,7 +904,7 @@ window.dashboard = function() {
                 return '#ef4444';
             };
 
-            // ⭐ TAMBAH parameter maxVal
+            // Opsi dasar grafik dengan parameter nilai maksimum sumbu Y.
             const baseOptions = (color, name, unit, maxVal) => ({
                 chart: {
                     type: 'bar',
@@ -915,13 +954,13 @@ window.dashboard = function() {
                 },
                 markers: { size: 0 },
                 
-                // ⭐ FIX DI SINI — paksa max & min
+                // Skala sumbu Y dipatok agar sesuai dengan label HTML di luar grafik.
                 yaxis: {
                     show: false,
-                    max: maxVal,             // ⬅️ PAKSA max sesuai HTML overlay
-                    min: 0,                  // ⬅️ PAKSA min
-                    forceNiceScale: false,   // ⬅️ jangan auto-round (biar 2000 tetap 2000)
-                    tickAmount: 5            // ⬅️ konsisten 5 tick
+                    max: maxVal,
+                    min: 0,
+                    forceNiceScale: false,
+                    tickAmount: 5
                 },
                 
                 xaxis: {
@@ -972,18 +1011,19 @@ window.dashboard = function() {
                 }
             });
 
-            // ⭐ Tambah maxVal di pemanggilan
+            // Opsi khusus untuk grafik gas, dengan pewarnaan per bar berdasarkan nilai.
             const gasOptions = baseOptions('#a855f7', 'Gas', 'ppm', 2000);
             gasOptions.plotOptions.bar.distributed = true;
             gasOptions.colors = [gasColorFn];
             gasOptions.fill = { type: 'solid' };
 
+            // Opsi khusus untuk grafik level air, dengan pewarnaan per bar berdasarkan nilai.
             const airOptions = baseOptions('#06b6d4', 'Level Air', '%', 100);
             airOptions.plotOptions.bar.distributed = true;
             airOptions.colors = [airColorFn];
             airOptions.fill = { type: 'solid' };
 
-            // ⭐ Tambah maxVal di pemanggilan
+            // Membuat dan merender keempat grafik.
             this.chartSuhu = new ApexCharts(document.querySelector('#chartSuhu'), baseOptions('#ef4444', 'Suhu', '°C', 50));
             this.chartRH   = new ApexCharts(document.querySelector('#chartRH'),   baseOptions('#3b82f6', 'Kelembapan', '%', 100));
             this.chartGas  = new ApexCharts(document.querySelector('#chartGas'),  gasOptions);
@@ -996,10 +1036,8 @@ window.dashboard = function() {
             console.log('4 mini bar charts initialized (Y-axis overlay mode)');
         },
 
-        // ============================================
-        // UPDATE 4 MINI BAR CHARTS
-        // 🔄 DATA TERBARU DI KIRI, LAMA DI KANAN
-        // ============================================
+        // Memperbarui keempat grafik dengan data riwayat terbaru.
+        // Data terbaru ditempatkan di sisi kiri, sedangkan data lama di sisi kanan.
         updateAllCharts(data) {
             const safe = (v) => (v === null || v === undefined || isNaN(parseFloat(v))) ? 0 : parseFloat(v);
             const fmtTime = (dateStr, withDate = false) => {
@@ -1010,7 +1048,7 @@ window.dashboard = function() {
                 return `${date} ${time}`;
             };
 
-            // ⭐ REVERSE: data terbaru → index 0 (paling kiri)
+            // Membalik urutan data agar entri terbaru berada di indeks paling kiri.
             const reversedData = [...data].reverse();
 
             const formatData = (key) => reversedData.map(d => ({
@@ -1031,6 +1069,7 @@ window.dashboard = function() {
             if (this.chartAir)  this.chartAir.updateSeries([{ name: 'Level Air', data: airData, rawData: airData }]);
         },
 
+        // Mengubah mode operasi dan menandai aksi sebagai tertunda hingga server merespons.
         async setMode(mode) {
             const key = 'mode';
             if (this.pendingTimeouts[key]) clearTimeout(this.pendingTimeouts[key]);
@@ -1054,6 +1093,7 @@ window.dashboard = function() {
             }
         },
 
+        // Mengubah status salah satu aktuator melalui server.
         async toggleControl(action) {
             if (this.pendingTimeouts[action]) clearTimeout(this.pendingTimeouts[action]);
             
@@ -1079,6 +1119,7 @@ window.dashboard = function() {
             }
         },
 
+        // Mengirim perintah kontrol ke server.
         async sendControl(action, value) {
             try {
                 const res = await fetch('/api/control', {
@@ -1099,6 +1140,7 @@ window.dashboard = function() {
             }
         },
 
+        // Memulai polling data sensor, riwayat, dan aktivitas secara berkala.
         startPolling() {
             this.pollingInterval = setInterval(() => {
                 this.loadLatest();

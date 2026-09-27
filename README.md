@@ -20,7 +20,7 @@ Project ini memungkinkan pengguna untuk memantau kondisi lingkungan greenhouse s
 * [🚀 Cara Menjalankan](#-cara-menjalankan)
 * [🧪 Testing](#-testing)
 * [🔧 Troubleshooting](#-troubleshooting)
-* [🔮 Pengembangan Selanjutnya](#-pengembangan-selanjutnya)
+* [🔮 Glosarium](#-glosarium-istilah)
 * [📚 Referensi](#-referensi)
 * [👨‍💻 Author](#-author)
 * [📄 License](#-license)
@@ -89,15 +89,15 @@ Sistem menggunakan protokol **MQTT** sebagai jembatan komunikasi antara device I
 ## 🏗️ Arsitektur Sistem
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
+┌────────────────────────────────────────────────────────────┐
 │                    WOKWI ESP32 (Simulasi)                  │
-│                                                             │
-│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌─────────┐ │
-│  │  DHT22   │   │   Soil   │   │   LDR    │   │ Button  │ │
-│  │  Sensor  │   │  Sensor  │   │  Sensor  │   │         │ │
-│  └────┬─────┘   └────┬─────┘   └────┬─────┘   └────┬────┘ │
-│       │              │              │              │      │
-│       └──────────────┴──────────────┴──────────────┘      │
+│                                                            │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌─────────┐  │
+│  │  DHT22   │   │   Soil   │   │   LDR    │   │ Button  │  │
+│  │  Sensor  │   │  Sensor  │   │  Sensor  │   │         │  │
+│  └────┬─────┘   └────┬─────┘   └────┬─────┘   └────┬────┘  │
+│       │              │              │              │       │
+│       └──────────────┴──────────────┴──────────────┘       │
 │                          │                                 │
 │                    ┌─────▼─────┐                           │
 │                    │   ESP32   │                           │
@@ -106,11 +106,11 @@ Sistem menggunakan protokol **MQTT** sebagai jembatan komunikasi antara device I
 │                          │                                 │
 │          ┌───────────────┼────────────────┐                │
 │          │               │                │                │
-│     ┌────▼────┐    ┌─────▼─────┐   ┌────▼─────┐          │
-│     │  Relay  │    │   Servo   │   │   LCD    │          │
-│     │  Lampu  │    │   Atap    │   │   16x2   │          │
-│     │  Kipas  │    │           │   │          │          │
-│     └─────────┘    └───────────┘   └──────────┘          │
+│     ┌────▼────┐    ┌─────▼─────┐   ┌────▼─────┐            │
+│     │  Relay  │    │   Servo   │   │   LCD    │            │
+│     │  Lampu  │    │   Atap    │   │   16x2   │            │
+│     │  Kipas  │    │           │   │          │            │
+│     └─────────┘    └───────────┘   └──────────┘            │
 └──────────────────────────┬─────────────────────────────────┘
                            │
                            │ MQTT (WiFi)
@@ -132,7 +132,7 @@ Sistem menggunakan protokol **MQTT** sebagai jembatan komunikasi antara device I
 │  ┌───────────────────────────────────────────────────────┐  │
 │  │              MqttSubscribe Command                    │  │
 │  │                                                       │  │
-│  │  • Subscribe greenhouse/sensor                       │  │
+│  │  • Subscribe greenhouse/sensor                        │  │
 │  │  • Parse data                                         │  │
 │  │  • Simpan ke MySQL                                    │  │
 │  └───────────────────────────────────────────────────────┘  │
@@ -140,23 +140,23 @@ Sistem menggunakan protokol **MQTT** sebagai jembatan komunikasi antara device I
 │  ┌───────────────────────────────────────────────────────┐  │
 │  │                     REST API                          │  │
 │  │                                                       │  │
-│  │  • GET  /api/sensor/latest                           │  │
-│  │  • GET  /api/sensor/history                          │  │
-│  │  • GET  /api/sensor/stats                            │  │
-│  │  • POST /api/control                                 │  │
-│  │  • GET  /api/control/history                         │  │
+│  │  • GET  /api/sensor/latest                            │  │
+│  │  • GET  /api/sensor/history                           │  │
+│  │  • GET  /api/sensor/stats                             │  │
+│  │  • POST /api/control                                  │  │
+│  │  • GET  /api/control/history                          │  │
 │  └───────────────────────────────────────────────────────┘  │
 └──────────────────────────┬──────────────────────────────────┘
                            │
                            │ HTTP
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   DASHBOARD (Browser)                      │
+│                   DASHBOARD (Browser)                       │
 │                                                             │
-│  • Sensor cards (suhu, kelembapan, tanah, cahaya)         │
-│  • Mode selector (otomatis/manual)                         │
-│  • Tombol kontrol aktuator                                 │
-│  • Grafik history (ApexCharts)                             │
+│  • Sensor cards (suhu, kelembapan, tanah, cahaya)           │
+│  • Mode selector (otomatis/manual)                          │
+│  • Tombol kontrol aktuator                                  │
+│  • Grafik history (ApexCharts)                              │
 │  • Auto-refresh setiap 1 detik                              │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -603,12 +603,6 @@ Project membutuhkan beberapa service yang berjalan secara bersamaan.
 Jika MySQL belum berjalan:
 
 ```bash
-startlamp
-```
-
-Atau:
-
-```bash
 sudo systemctl start mysql
 ```
 
@@ -753,30 +747,34 @@ sudo tail -50 /var/log/mysql/error.log
 ```
 
 ---
+## 📚 Glosarium Istilah
 
-## 🔮 Pengembangan Selanjutnya
+Berikut penjelasan beberapa istilah teknis yang digunakan dalam project ini.
 
-### Fitur
-
-* [ ] **Halaman History** — Menampilkan seluruh data sensor dengan filter.
-* [ ] **Login/Auth** — Menggunakan Laravel Breeze/Fortify.
-* [ ] **Notifikasi** — Email/Telegram ketika suhu berada pada kondisi ekstrem.
-* [ ] **Export CSV** — Download data sensor.
-* [ ] **Multi-device** — Mendukung beberapa greenhouse.
-* [ ] **WebSocket** — Real-time tanpa polling.
-* [ ] **Mobile App** — Flutter/React Native.
-* [ ] **AI Chatbot** — Integrasi GPT untuk voice command.
-* [ ] **Kamera** — ESP32-CAM untuk monitoring visual.
-* [ ] **Deployment** — VPS + domain + SSL.
-
-### Upgrade Hardware
-
-* [ ] **Sensor Soil Moisture Asli** — Menggantikan potentiometer.
-* [ ] **Sensor Ultrasonic** — Monitoring level air tandon.
-* [ ] **RTC DS3231** — Menambahkan real-time clock.
-* [ ] **ESP32-CAM** — Monitoring visual.
-* [ ] **Sensor pH** — Untuk kebutuhan hidroponik.
-
+| Istilah | Penjelasan |
+| --- | --- |
+| **IoT** | Internet of Things, yaitu konsep menghubungkan perangkat fisik ke internet agar dapat dimonitor dan dikendalikan dari jarak jauh. |
+| **ESP32** | Mikrokontroler dengan koneksi WiFi dan Bluetooth bawaan, digunakan sebagai otak perangkat pada project ini. |
+| **Sensor** | Perangkat yang mengubah besaran fisik (suhu, cahaya, kelembapan) menjadi sinyal listrik yang dapat dibaca mikrokontroler. |
+| **Aktuator** | Perangkat yang mengubah sinyal listrik menjadi aksi fisik, misalnya relay, servo, atau buzzer. |
+| **Relay** | Saklar elektronik yang dikendalikan sinyal listrik, digunakan untuk menyalakan atau mematikan perangkat berdaya lebih besar. |
+| **Servo** | Motor yang dapat diputar ke sudut tertentu, digunakan untuk membuka dan menutup atap greenhouse. |
+| **MQTT** | Message Queuing Telemetry Transport, protokol komunikasi ringan yang dirancang untuk perangkat IoT dengan bandwidth terbatas. |
+| **MQTT Broker** | Server yang menerima pesan dari publisher dan meneruskannya ke subscriber. Pada project ini digunakan HiveMQ. |
+| **Publish** | Aksi mengirim pesan ke sebuah topik pada broker MQTT. |
+| **Subscribe** | Aksi berlangganan sebuah topik pada broker MQTT agar menerima pesan yang dikirim ke topik tersebut. |
+| **Topic** | Nama saluran pada MQTT, misalnya `greenhouse/sensor` atau `greenhouse/control`. |
+| **QoS** | Quality of Service, tingkat jaminan pengiriman pesan pada MQTT (0, 1, atau 2). |
+| **Retained Message** | Pesan terakhir yang disimpan broker pada sebuah topik dan akan dikirim ke subscriber baru. |
+| **REST API** | Antarmuka berbasis HTTP yang memungkinkan frontend berkomunikasi dengan backend menggunakan method seperti GET dan POST. |
+| **JSON** | Format pertukaran data berbasis teks yang mudah dibaca manusia dan mesin. |
+| **Polling** | Teknik pengambilan data secara berkala dari server, misalnya setiap satu detik. |
+| **WebSocket** | Protokol komunikasi dua arah yang memungkinkan server mengirim data ke browser tanpa diminta. |
+| **Threshold** | Nilai batas yang menjadi acuan logika otomatis, misalnya suhu maksimum 30°C. |
+| **Wokwi** | Simulator online untuk ESP32, Arduino, dan komponen elektronik lainnya. |
+| **Arduino CLI** | Alat baris perintah untuk meng-compile dan meng-upload sketch Arduino/ESP32. |
+| **Laravel Artisan** | Antarmuka baris perintah Laravel untuk menjalankan perintah seperti `migrate`, `serve`, atau command kustom. |
+| **CSRF Token** | Token keamanan Laravel untuk mencegah permintaan palsu dari situs lain. |
 ---
 
 ## 📚 Referensi
@@ -793,9 +791,9 @@ sudo tail -50 /var/log/mysql/error.log
 
 ## 👨‍💻 Author
 
-**Nama:** [Nama Kamu]
-**Email:** [Email Kamu]
-**GitHub:** [GitHub Kamu]
+**Nama:** Muhammad Alfarizi | 
+**Email:** mhmdalfrzi.03@gmail.com | 
+**GitHub:** github.com/alfrzimhmd
 
 ---
 
@@ -818,6 +816,6 @@ Bebas digunakan untuk pembelajaran dan pengembangan.
 
 <div align="center">
 
-**Dibuat dengan ❤️ untuk pembelajaran IoT Indonesia**
+**Dibuat dengan ❤️ dari pembelajar untuk pembelajar**
 
 </div>

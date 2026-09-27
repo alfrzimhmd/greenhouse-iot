@@ -3,27 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{-- Token CSRF untuk kebutuhan permintaan AJAX dari dashboard. --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Greenhouse IoT')</title>
     
     <!-- Tailwind CSS -->
+    {{-- Tailwind dimuat melalui CDN untuk keperluan pengembangan. --}}
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- ApexCharts -->
+    {{-- Pustaka grafik yang digunakan pada kartu riwayat sensor. --}}
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.0/dist/apexcharts.min.js"></script>
     
     <!-- Google Fonts (Inter) -->
+    {{-- Font Inter dipakai sebagai tipografi utama dashboard. --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
+        /* Menyembunyikan elemen Alpine.js sebelum proses inisialisasi selesai. */
         [x-cloak] { display: none !important; }
         
+        /* Tipografi dasar halaman. */
         body {
             font-family: 'Inter', sans-serif;
         }
         
+        /* Penyesuaian tampilan scrollbar agar selaras dengan tema. */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { 
@@ -34,6 +41,7 @@
             background: rgba(255,255,255,0.5); 
         }
         
+        /* Efek transisi halus saat kartu didekati kursor. */
         .card-hover {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -42,12 +50,14 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
         
+        /* Latar belakang kartu dengan efek kaca. */
         .glass {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
         
+        /* Animasi pergerakan latar belakang halaman. */
         @keyframes gradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -60,33 +70,36 @@
             animation: gradient 15s ease infinite;
         }
         
+        /* Animasi titik indikator status koneksi. */
         @keyframes pulse-dot {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.7; transform: scale(1.2); }
         }
         .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
         
+        /* Angka status ditampilkan dengan lebar digit yang konsisten. */
         .stat-value {
             font-variant-numeric: tabular-nums;
         }
         
+        /* Animasi bilah pemuatan. */
         @keyframes loading {
             from { width: 0%; }
             to { width: 100%; }
         }
 
-        /* ============================================================
-           CHART STYLING
-           Y-axis overlay FIXED di luar scroll area.
-           Hanya SVG bar yang di-scroll.
-        ============================================================ */
+        /*
+            Penataan grafik riwayat sensor.
+            Sumbu Y ditempatkan di luar area gulir sehingga tetap terlihat
+            ketika pengguna menggulir data ke arah horizontal.
+        */
         .chart-wrapper {
             position: relative;
             width: 100%;
             height: 260px;
         }
 
-        /* Area Y-axis (fixed, tidak ikut scroll) */
+        /* Area sumbu Y yang tidak ikut bergulir bersama data. */
         .chart-yaxis {
             position: absolute;
             left: 0;
@@ -97,7 +110,7 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: flex-end;
-            padding: 22px 4px 32px 0;   /* top = grid padding top, bottom = x-axis height */
+            padding: 22px 4px 32px 0;   /* Padding atas mengikuti grid, padding bawah mengikuti tinggi sumbu X. */
             font-size: 10px;
             font-weight: 600;
             color: #6b7280;
@@ -110,10 +123,10 @@
             line-height: 1;
         }
 
-        /* Area scroll untuk chart (bar saja) */
+        /* Area gulir horizontal yang memuat batang grafik. */
         .chart-scroll {
             position: absolute;
-            left: 42px;              /* geser ke kanan untuk kasih ruang Y-axis */
+            left: 42px;              /* Memberikan ruang untuk sumbu Y. */
             right: 0;
             top: 0;
             bottom: 0;
@@ -132,7 +145,7 @@
             background: #f1f5f9;
         }
 
-        /* Garis vertikal pembatas Y-axis (visual) */
+        /* Garis pembatas vertikal antara sumbu Y dan area grafik. */
         .chart-yaxis-border {
             position: absolute;
             left: 42px;
@@ -145,13 +158,17 @@
         }
     </style>
     
+    {{-- Slot untuk gaya tambahan dari halaman turunan. --}}
     @stack('styles')
 </head>
 <body class="animated-bg min-h-screen">
+    {{-- Konten utama halaman turunan. --}}
     @yield('content')
     
+    {{-- Slot untuk skrip tambahan dari halaman turunan. --}}
     @stack('scripts')
     
+    {{-- Alpine.js dimuat dengan atribut defer agar tidak menghambat render halaman. --}}
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 </body>
 </html>

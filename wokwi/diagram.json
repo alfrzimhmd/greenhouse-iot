@@ -176,21 +176,7 @@
       "id": "label_btn1",
       "top": 508.8,
       "left": -576,
-      "attrs": { "text": "[] TOMBOL 1: MODE\nGanti mode AUTO / MANUAL" }
-    },
-    {
-      "type": "wokwi-pushbutton",
-      "id": "btn2",
-      "top": 659,
-      "left": -307.2,
-      "attrs": { "color": "green", "xray": "1" }
-    },
-    {
-      "type": "wokwi-text",
-      "id": "label_btn2",
-      "top": 652.8,
-      "left": -585.6,
-      "attrs": { "text": "[] TOMBOL 2: MANUAL\nGanti aktuator saat mode manual" }
+      "attrs": { "text": "TOMBOL 1: MODE\nGanti mode AUTO / MANUAL" }
     },
     {
       "type": "wokwi-resistor",
@@ -224,68 +210,51 @@
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
     [ "esp:RX", "$serialMonitor:TX", "", [] ],
-
     [ "dht1:VCC", "esp:3V3", "red", [ "h-28.8", "v163.2", "h-0.15" ] ],
     [ "dht1:GND", "esp:GND.2", "black", [ "h67.2", "v211.2" ] ],
     [ "dht1:SDA", "esp:15", "green", [ "h96.1", "v355.2" ] ],
-
     [ "pot_gas:VCC", "esp:3V3", "red", [ "v9.6", "h229.45" ] ],
     [ "pot_gas:GND", "esp:GND.1", "black", [ "v0" ] ],
     [ "pot_gas:SIG", "esp:34", "yellow", [ "v48", "h239.45" ] ],
-
     [ "ldr1:VCC", "esp:3V3", "red", [ "v-57.6", "h278.25" ] ],
     [ "ldr1:GND", "esp:GND.1", "black", [ "v57.2", "h278.25" ] ],
     [ "ldr1:AO", "esp:35", "yellow", [ "h76.8", "v-173.5" ] ],
-
     [ "pot_air:VCC", "esp:3V3", "red", [ "h-28.8", "v-57.6" ] ],
     [ "pot_air:GND", "esp:GND.1", "black", [ "h0", "v-28.8" ] ],
     [ "pot_air:SIG", "esp:32", "yellow", [ "h-28.8", "v-96" ] ],
-
     [ "relay_growlight:VCC", "esp:5V", "red", [ "h-172.8", "v-115.2" ] ],
     [ "relay_growlight:GND", "esp:GND.3", "black", [ "h-28.8", "v-86.8" ] ],
     [ "relay_growlight:IN", "esp:26", "orange", [ "h-192", "v-221" ] ],
     [ "relay_growlight:COM", "esp:5V", "red", [ "h30", "v-68.6", "h-316.95" ] ],
-
     [ "relay_exhaust:VCC", "esp:5V", "red", [ "h0" ] ],
     [ "relay_exhaust:GND", "esp:GND.1", "black", [ "h-220.8", "v-269.2" ] ],
     [ "relay_exhaust:IN", "esp:27", "orange", [ "h-201.6", "v-326.6" ] ],
     [ "relay_exhaust:COM", "esp:5V", "red", [ "h39.6", "v-193.4", "h-326.55" ] ],
-
     [ "relay_pump:VCC", "esp:5V", "red", [ "h0" ] ],
     [ "relay_pump:GND", "esp:GND.1", "black", [ "h-220.8", "v-355" ] ],
     [ "relay_pump:IN", "esp:14", "orange", [ "h-201.6", "v-412" ] ],
     [ "relay_pump:COM", "esp:5V", "red", [ "h39.6", "v-193.4", "h-416" ] ],
-
     [ "esp:26", "r1:1", "green", [ "h0" ] ],
     [ "r1:2", "led_grow_r:A", "green", [ "h0" ] ],
     [ "led_grow_r:C", "esp:GND.3", "black", [ "h0" ] ],
-
     [ "esp:26", "r2:1", "green", [ "h0" ] ],
     [ "r2:2", "led_grow_b:A", "green", [ "h0" ] ],
     [ "led_grow_b:C", "esp:GND.3", "black", [ "h0" ] ],
-
     [ "motor_exhaust:1", "relay_exhaust:NO", "orange", [ "h0" ] ],
     [ "motor_exhaust:2", "esp:GND.1", "black", [ "h0" ] ],
-
     [ "motor_pump:1", "relay_pump:NO", "orange", [ "h0" ] ],
     [ "motor_pump:2", "esp:GND.1", "black", [ "h0" ] ],
-
     [ "servo1:V+", "esp:5V", "green", [ "h0" ] ],
     [ "servo1:GND", "esp:GND.1", "black", [ "h-57.6", "v-364.8" ] ],
     [ "servo1:PWM", "esp:13", "purple", [ "h-76.8", "v-374.2" ] ],
-
     [ "lcd2:VCC", "esp:5V", "green", [ "h-9.6", "v326.5", "h-163.35" ] ],
     [ "lcd2:GND", "esp:GND.3", "black", [ "h-28.8", "v201.6" ] ],
     [ "lcd2:SDA", "esp:21", "blue", [ "h-48", "v173" ] ],
     [ "lcd2:SCL", "esp:22", "blue", [ "h-57.6", "v211.5" ] ],
-
     [ "bz1:2", "esp:25", "green", [ "v0" ] ],
     [ "bz1:1", "esp:GND.1", "black", [ "v0" ] ],
-
     [ "btn1:2.l", "esp:GND.1", "black", [ "h-9.6", "v-182.2" ] ],
-    [ "btn1:1.l", "esp:4", "green", [ "v-28.8", "h192", "v-201.6" ] ],
-    [ "btn2:1.l", "esp:2", "green", [ "h-19.2", "v-297.6" ] ],
-    [ "btn2:2.l", "esp:GND.1", "black", [ "h-9.6", "v-259" ] ]
+    [ "btn1:1.l", "esp:4", "green", [ "v-28.8", "h192", "v-201.6" ] ]
   ],
   "dependencies": {}
 }

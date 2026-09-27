@@ -7,12 +7,11 @@
 #include <ArduinoJson.h>
 #include <time.h>
 
-// ============ DEBUG MODE ============
-// Set 1 = percepat waktu 60x (untuk testing)
-// Set 0 = waktu normal (untuk hardware asli)
+// Mode debug untuk pengujian: mempercepat waktu 60 kali lipat.
+// Gunakan nilai 0 saat dijalankan pada perangkat keras sebenarnya.
 #define DEBUG_TIME_SCALE 1
 
-// ============ WIFI & MQTT ============
+// Konfigurasi koneksi WiFi dan broker MQTT.
 const char* WIFI_SSID = "Wokwi-GUEST";
 const char* WIFI_PASS = "";
 const char* MQTT_BROKER = "broker.hivemq.com";
@@ -24,7 +23,7 @@ const char* TOPIC_EVENTS = "greenhouse/events";
 
 String clientId;
 
-// ============ NTP ============
+// Konfigurasi NTP untuk sinkronisasi waktu.
 const char* NTP_SERVER = "pool.ntp.org";
 const long GMT_OFFSET_SEC = 7 * 3600;
 const int DAYLIGHT_OFFSET_SEC = 0;
@@ -32,7 +31,7 @@ const int DAYLIGHT_OFFSET_SEC = 0;
 WiFiClient espClient;
 PubSubClient mqtt(espClient);
 
-// ============ PIN DEFINITIONS ============
+// Pemetaan pin perangkat keras.
 #define DHTPIN 15
 #define DHTTYPE DHT22
 #define GAS_PIN 34
@@ -46,12 +45,12 @@ PubSubClient mqtt(espClient);
 #define BTN_MODE 4
 #define BTN_MANUAL 2
 
-// ============ OBJECTS ============
+// Objek untuk sensor, display, dan servo.
 DHT dht(DHTPIN, DHTTYPE);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 Servo atapServo;
 
-// ============ THRESHOLDS ============
+// Ambang batas untuk pembacaan sensor dan alarm.
 const float SUHU_ALARM_HIGH = 35.0;
 const float SUHU_ALARM_LOW = 15.0;
 const float SUHU_MAX = 32.0;
@@ -61,12 +60,12 @@ const int CAHAYA_MIN_PCT = 30;
 const float AIR_TANDON_MIN = 20.0;
 const float AIR_TANDON_ALARM = 10.0;
 
-// ============ EVENT LOG THRESHOLDS ============
+// Ambang batas untuk pencatatan event.
 const float SUHU_LOG_DELTA = 1.0;
 const unsigned long SUHU_LOG_INTERVAL = 300000UL;
 const unsigned long ACTUATOR_LOG_DEBOUNCE = 10000UL;
 
-// ============ SCHEDULE ============
+// Konfigurasi jadwal penyiraman.
 #define MAX_SCHEDULES 5
 
 struct Schedule {
@@ -74,14 +73,14 @@ struct Schedule {
   int minute;
   int duration;
   bool active;
-  bool triggeredToday;   // ⭐ track sudah trigger hari ini
-  int lastTriggeredDay;  // ⭐ track hari terakhir trigger
+  bool triggeredToday;   // Menandai apakah jadwal sudah dijalankan hari ini.
+  int lastTriggeredDay;  // Menyimpan hari terakhir jadwal dijalankan.
 };
 
 Schedule schedules[MAX_SCHEDULES];
 int scheduleCount = 0;
 
-// ============ STATE ============
+// Status global sistem.
 bool modeOtomatis = true;
 bool growLightOn = false;
 bool exhaustOn = false;
@@ -94,18 +93,18 @@ unsigned long pumpStartTime = 0;
 unsigned long pumpDuration = 0;
 String pumpTrigger = "idle";
 
-// NTP
+// Status sinkronisasi waktu.
 bool ntpSynced = false;
 unsigned long fakeClockMs = 0;
 
-// Event log state
+// Status pencatatan event.
 float lastLoggedSuhu = -999.0;
 unsigned long lastSuhuLogTime = 0;
 unsigned long lastGrowLightLogTime = 0;
 unsigned long lastExhaustLogTime = 0;
 unsigned long lastAtapLogTime = 0;
 
-// Timing
+// Pewaktu untuk berbagai tugas berkala.
 unsigned long lastRead = 0;
 unsigned long lastLcd = 0;
 unsigned long lastSerial = 0;
@@ -117,10 +116,10 @@ const unsigned long INTERVAL_READ = 2000;
 const unsigned long INTERVAL_LCD = 3000;
 const unsigned long INTERVAL_SERIAL = 5000;
 const unsigned long INTERVAL_MQTT = 3000;
-const unsigned long INTERVAL_SCHEDULE_CHECK = 100;   // ⭐ cek jadwal tiap 100ms
+const unsigned long INTERVAL_SCHEDULE_CHECK = 100;
 const unsigned long MQTT_RECONNECT_INTERVAL = 5000;
 
-// ============ SENSOR VALUES ============
+// Nilai sensor yang sedang aktif.
 float suhu = 25.0;
 float kelembapan = 60.0;
 int gas = 0;
@@ -134,7 +133,7 @@ int currentMinute = 0;
 int currentSecond = 0;
 int currentDay = 0;
 
-// ============ UTIL: Dapatkan waktu sekarang ============
+// Mengambil waktu saat ini dari NTP bila tersedia, atau dari jam internal.
 bool getCurrentTime(int &hour, int &minute, int &second, int &day) {
   if (ntpSynced) {
     struct tm timeinfo;
@@ -159,6 +158,7 @@ bool getCurrentTime(int &hour, int &minute, int &second, int &day) {
   }
 }
 
+// Mencetak angka dengan format dua digit ke Serial.
 void print2digits(int v) {
   if (v < 0) {
     Serial.print("-");
@@ -168,7 +168,7 @@ void print2digits(int v) {
   Serial.print(v);
 }
 
-// ============ LOG EVENT KE MQTT ============
+// Mengirim catatan event ke broker MQTT dalam format JSON.
 void logEvent(String type, String title, String desc, String severity, String icon = "", String event = "") {
   if (!mqtt.connected()) return;
   
@@ -190,7 +190,7 @@ void logEvent(String type, String title, String desc, String severity, String ic
   Serial.println(title);
 }
 
-// ============ LOG SUHU ============
+// Mencatat perubahan suhu yang signifikan atau pencatatan berkala.
 void checkTemperatureLog() {
   unsigned long now = millis();
   
@@ -237,7 +237,7 @@ void checkTemperatureLog() {
   }
 }
 
-// ============ MQTT CALLBACK ============
+// Menangani pesan masuk dari broker MQTT.
 void callback(char* topic, byte* payload, unsigned int length) {
   String message = "";
   for (int i = 0; i < length; i++) message += (char)payload[i];
@@ -250,7 +250,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   
   String action = doc["action"] | "";
   
-  // ===== HANDLE SCHEDULE =====
+  // Menangani pembaruan jadwal dari server.
   if (action == "set_schedules") {
     Serial.println("[SCHEDULE] Menerima jadwal dari Laravel...");
     
@@ -265,7 +265,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
       schedules[scheduleCount].minute = s["minute"] | 0;
       schedules[scheduleCount].duration = s["duration"] | 10;
       schedules[scheduleCount].active = true;
-      schedules[scheduleCount].triggeredToday = false;   // reset
+      schedules[scheduleCount].triggeredToday = false;
       schedules[scheduleCount].lastTriggeredDay = -1;
       
       Serial.print("  [");
@@ -287,7 +287,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     return;
   }
   
-  // ===== HANDLE CONTROL =====
+  // Menangani perintah kontrol dari dashboard.
   if (doc.containsKey("value")) {
     String value = doc["value"];
     
@@ -362,10 +362,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
       Serial.print("[EVENT] Mode -> ");
       Serial.println(modeOtomatis ? "OTOMATIS (MQTT)" : "MANUAL (MQTT)");
       
-      // Reset pump override saat pindah ke AUTO
+      // Mengembalikan kontrol pompa ke mode otomatis saat beralih ke AUTO.
       if (modeOtomatis) {
         pumpManualOverride = false;
-        // Reset schedule triggeredToday biar cek ulang
+        // Mengulang pengecekan jadwal setelah mode berubah.
         for (int i = 0; i < scheduleCount; i++) {
           schedules[i].triggeredToday = false;
         }
@@ -379,7 +379,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
-// ============ SETUP WIFI ============
+// Menghubungkan perangkat ke jaringan WiFi.
 void setupWiFi() {
   Serial.print("[WiFi] Connecting to ");
   Serial.println(WIFI_SSID);
@@ -399,7 +399,7 @@ void setupWiFi() {
   }
 }
 
-// ============ SETUP NTP ============
+// Menyinkronkan waktu sistem dengan server NTP.
 void setupNTP() {
   Serial.print("[NTP] Syncing...");
   configTime(GMT_OFFSET_SEC, DAYLIGHT_OFFSET_SEC, NTP_SERVER);
@@ -427,7 +427,7 @@ void setupNTP() {
   }
 }
 
-// ============ SETUP MQTT ============
+// Menghubungkan kembali ke broker MQTT bila terputus.
 void reconnectMQTT() {
   if (millis() - lastMqttReconnect < MQTT_RECONNECT_INTERVAL) return;
   lastMqttReconnect = millis();
@@ -457,6 +457,7 @@ void reconnectMQTT() {
   }
 }
 
+// Menginisialisasi konfigurasi MQTT.
 void setupMQTT() {
   mqtt.setServer(MQTT_BROKER, MQTT_PORT);
   mqtt.setCallback(callback);
@@ -466,7 +467,7 @@ void setupMQTT() {
   reconnectMQTT();
 }
 
-// ============ SETUP ============
+// Inisialisasi awal seluruh sistem.
 void setup() {
   Serial.begin(115200);
   delay(1000);
@@ -525,7 +526,7 @@ void setup() {
   Serial.println();
 }
 
-// ============ BACA SENSOR ============
+// Membaca seluruh sensor yang terpasang.
 void bacaSensor() {
   float nt = dht.readTemperature();
   float nh = dht.readHumidity();
@@ -541,33 +542,37 @@ void bacaSensor() {
   jarakAir = map(levelAir, 100, 0, 5, 30);
 }
 
-// ============ KONVERSI ============
+// Mengubah nilai ADC cahaya menjadi persentase.
 int cahayaPersen() {
   int p = map(cahaya, 4095, 0, 0, 100);
   return constrain(p, 0, 100);
 }
 
+// Mengubah nilai ADC gas menjadi estimasi ppm.
 int gasPPM() {
   return map(gas, 0, 4095, 0, 2000);
 }
 
+// Menentukan status gas berdasarkan ambang batas.
 const char* gasStatus() {
   if (gas > GAS_ALARM) return "BAHAYA";
   if (gas > GAS_MIN)   return "TINGGI";
   return "NORMAL";
 }
 
+// Menentukan status cahaya berdasarkan ambang batas.
 const char* cahayaStatus() {
   return (cahayaPersen() < CAHAYA_MIN_PCT) ? "GELAP" : "TERANG";
 }
 
+// Menentukan status ketinggian air.
 const char* airStatus() {
   if (levelAir < AIR_TANDON_ALARM) return "KRITIS";
   if (levelAir < AIR_TANDON_MIN)   return "RENDAH";
   return "NORMAL";
 }
 
-// ============ CEK JADWAL POMPA (NEW LOGIC) ============
+// Memeriksa jadwal penyiraman dan menjalankan pompa bila waktunya tiba.
 void cekJadwalPompa() {
   if (!modeOtomatis) return;
   if (pumpManualOverride) return;
@@ -581,25 +586,24 @@ void cekJadwalPompa() {
   for (int i = 0; i < scheduleCount; i++) {
     if (!schedules[i].active) continue;
     
-    // Reset triggeredToday kalau hari berubah
+    // Mengulang status harian saat hari berganti.
     if (schedules[i].lastTriggeredDay != day) {
       schedules[i].triggeredToday = false;
     }
     
-    // Skip kalau sudah trigger hari ini
+    // Melewati jadwal yang sudah dijalankan hari ini.
     if (schedules[i].triggeredToday) continue;
     
     int schedTotalMin = schedules[i].hour * 60 + schedules[i].minute;
     
-    // ⭐ Trigger kalau waktu sekarang >= jadwal (catch-up)
-    // Tapi batasi jangan lebih dari 5 menit lewat
+    // Menjalankan jadwal bila waktu sekarang sudah melewati atau sama.
     int diff = currentTotalMin - schedTotalMin;
     
-    // Handle lewat tengah malam
+    // Menangani perbedaan waktu melewati tengah malam.
     if (diff < -720) diff += 1440;
     if (diff > 720) diff -= 1440;
     
-    if (diff >= 0 && diff <= 5) {   // 0-5 menit lewat
+    if (diff >= 0 && diff <= 5) {
       Serial.print("[SCHEDULE] TRIGGER #");
       Serial.print(i);
       Serial.print(" (");
@@ -633,16 +637,16 @@ void cekJadwalPompa() {
       
       schedules[i].triggeredToday = true;
       schedules[i].lastTriggeredDay = day;
-      break;   // hanya 1 jadwal per cek
+      break;   // Hanya satu jadwal yang dijalankan per pemeriksaan.
     }
   }
 }
 
-// ============ LOGIKA OTOMATIS ============
+// Menjalankan logika otomatis untuk aktuator dan alarm.
 void logikaOtomatis() {
   unsigned long now = millis();
   
-  // GROW LIGHT
+  // Kontrol lampu tanam berdasarkan intensitas cahaya.
   bool perluCahaya = (cahayaPersen() < CAHAYA_MIN_PCT);
   if (perluCahaya != growLightOn) {
     growLightOn = perluCahaya;
@@ -663,7 +667,7 @@ void logikaOtomatis() {
     }
   }
 
-  // EXHAUST
+  // Kontrol kipas pembuangan berdasarkan suhu dan kadar gas.
   bool perluExhaust = (suhu > SUHU_MAX) || (gas > GAS_MIN);
   if (perluExhaust != exhaustOn) {
     exhaustOn = perluExhaust;
@@ -688,7 +692,7 @@ void logikaOtomatis() {
     }
   }
 
-  // ATAP
+  // Kontrol atap ventilasi berdasarkan suhu dan kadar gas.
   bool perluBukaAtap = (suhu > SUHU_MAX) || (gas > GAS_MIN);
   if (perluBukaAtap != atapTerbuka) {
     atapTerbuka = perluBukaAtap;
@@ -704,7 +708,7 @@ void logikaOtomatis() {
     }
   }
 
-  // WATER PUMP — safety & auto-off
+  // Pengamanan dan penghentian otomatis untuk pompa air.
   if (levelAir < AIR_TANDON_MIN && pumpOn) {
     pumpOn = false;
     pumpManualOverride = false;
@@ -730,7 +734,7 @@ void logikaOtomatis() {
     }
   }
 
-  // ALARM
+  // Evaluasi kondisi alarm untuk suhu, gas, dan air.
   bool alarmSuhu = (suhu > SUHU_ALARM_HIGH) || (suhu < SUHU_ALARM_LOW);
   bool alarmGas  = (gas > GAS_ALARM);
   bool alarmAir  = (levelAir < AIR_TANDON_ALARM);
@@ -762,6 +766,7 @@ void logikaOtomatis() {
     }
   }
   
+  // Bunyi peringatan berkala selama alarm aktif.
   if (alarmActive) {
     static unsigned long lastBeep = 0;
     if (now - lastBeep >= 3000) {
@@ -771,7 +776,7 @@ void logikaOtomatis() {
   }
 }
 
-// ============ KIRIM DATA KE MQTT ============
+// Mengirim data sensor dan status aktuator ke broker MQTT.
 void kirimDataMQTT() {
   if (!mqtt.connected()) return;
   
@@ -813,7 +818,7 @@ void kirimDataMQTT() {
   Serial.println();
 }
 
-// ============ LCD ============
+// Menampilkan informasi utama pada layar LCD.
 void tampilLcd() {
   int hour, minute, second, day;
   getCurrentTime(hour, minute, second, day);
@@ -840,7 +845,7 @@ void tampilLcd() {
   lcd.print(minute);
 }
 
-// ============ SERIAL LOG STATUS ============
+// Menuliskan ringkasan status sistem ke Serial.
 void logStatus() {
   int hour, minute, second, day;
   getCurrentTime(hour, minute, second, day);
@@ -865,7 +870,7 @@ void logStatus() {
   Serial.print("Jadwal tersimpan: ");
   Serial.println(scheduleCount);
   
-  // ⭐ Tampilkan detail jadwal + status triggeredToday
+  // Menampilkan detail jadwal beserta status eksekusinya.
   for (int i = 0; i < scheduleCount; i++) {
     Serial.print("  [");
     Serial.print(i);
@@ -937,7 +942,7 @@ void logStatus() {
   Serial.println("==================================");
 }
 
-// ============ TOMBOL ============
+// Membaca status tombol fisik dan menjalankan aksinya.
 void cekTombol() {
   static bool lastModeBtn = HIGH;
   static bool lastManualBtn = HIGH;
@@ -1024,7 +1029,7 @@ void cekTombol() {
   lastManualBtn = manualBtn;
 }
 
-// ============ LOOP ============
+// Fungsi utama yang dijalankan berulang selama sistem aktif.
 void loop() {
   unsigned long now = millis();
 
@@ -1042,7 +1047,7 @@ void loop() {
   currentSecond = second;
   currentDay = day;
 
-  // Baca sensor & logika otomatis
+  // Membaca sensor dan menjalankan logika otomatis secara berkala.
   if (now - lastRead >= INTERVAL_READ) {
     lastRead = now;
     bacaSensor();
@@ -1050,25 +1055,25 @@ void loop() {
     checkTemperatureLog();
   }
 
-  // ⭐ CEK JADWAL tiap 100ms (jauh lebih sering, biar tidak kelewat)
+  // Memeriksa jadwal penyiraman dengan interval yang lebih rapat.
   if (now - lastScheduleCheck >= INTERVAL_SCHEDULE_CHECK) {
     lastScheduleCheck = now;
     if (modeOtomatis) cekJadwalPompa();
   }
 
-  // LCD
+  // Memperbarui tampilan LCD.
   if (now - lastLcd >= INTERVAL_LCD) {
     lastLcd = now;
     tampilLcd();
   }
 
-  // Serial log
+  // Menulis ringkasan status ke Serial.
   if (now - lastSerial >= INTERVAL_SERIAL) {
     lastSerial = now;
     logStatus();
   }
 
-  // MQTT publish
+  // Mengirim data ke broker MQTT.
   if (now - lastMqtt >= INTERVAL_MQTT) {
     lastMqtt = now;
     kirimDataMQTT();
