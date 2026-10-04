@@ -627,9 +627,18 @@ php artisan serve
 Buka project menggunakan VS Code:
 
 ```bash
-cd ~/pemrograman/laravel/greenhouse-iot
+cd ~/pemrograman/laravel/greenhouse-iot/wokwi
 
 code .
+```
+
+Jalankan perintah berikut ini untuk compile project :
+```bash
+arduino-cli compile \
+  --fqbn esp32:esp32:esp32 \
+  --output-dir build/esp32.esp32.esp32 \
+  .
+  .
 ```
 
 Kemudian:

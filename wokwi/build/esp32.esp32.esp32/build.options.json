@@ -3,7 +3,7 @@
   "compiler.optimization_flags": "-Os",
   "customBuildProperties": "",
   "fqbn": "esp32:esp32:esp32",
-  "hardwareFolders": "/home/all/.arduino15/packages/esp32/hardware/esp32/3.3.12,/home/all/.arduino15/packages/esp32/hardware/esp32/3.3.12",
-  "otherLibrariesFolders": "/home/all/Arduino/libraries",
+  "hardwareFolders": "/home/all/ArduinoCLI/data/packages/esp32/hardware/esp32/3.3.12,/home/all/ArduinoCLI/data/packages/esp32/hardware/esp32/3.3.12",
+  "otherLibrariesFolders": "/home/all/ArduinoCLI/sketchbook/libraries",
   "sketchLocation": "/home/all/pemrograman/laravel/greenhouse-iot/wokwi"
 }
